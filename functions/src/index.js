@@ -72,20 +72,22 @@ app.post("/", async (req, res) => {
 
                         const counterVal = snapshot.val()
 
-                        axios.post(botUrl + "/editMessageText", {
-                            chat_id: functions.config().telegram.chat_id,
-                            message_id: id,
-                            text: cb.message.text,
-                            parse_mode: "HTML",
-                            reply_markup: {
-                                inline_keyboard: [
-                                    [{ text: "Reaktori: " + counterVal.reaktor, callback_data: "reaktor" }],
-                                    [{ text: "Newton: " + counterVal.newton, callback_data: "newton" }],
-                                    [{ text: "Hertsi: " + counterVal.hertsi, callback_data: "hertsi" }],
-                                    [{ text: "SÅÅS: " + counterVal.såås, callback_data: "såås" }]
-                                ]
-                            }
-                        })
+                        axios
+                            .post(botUrl + "/editMessageText", {
+                                chat_id: functions.config().telegram.chat_id,
+                                message_id: id,
+                                text: cb.message.text,
+                                parse_mode: "HTML",
+                                reply_markup: {
+                                    inline_keyboard: [
+                                        [{ text: "Reaktori: " + counterVal.reaktor, callback_data: "reaktor" }],
+                                        [{ text: "Newton: " + counterVal.newton, callback_data: "newton" }],
+                                        [{ text: "Hertsi: " + counterVal.hertsi, callback_data: "hertsi" }],
+                                        [{ text: "SÅÅS: " + counterVal.såås, callback_data: "såås" }]
+                                    ]
+                                }
+                            })
+                            .catch(e => console.error(e))
                     }
                 }
             )
