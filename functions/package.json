@@ -1,0 +1,37 @@
+{
+    "name": "ruokabla-bot",
+    "version": "1.0.0",
+    "description": "Telegram bot that tells what food tampere university hervanta campus has",
+    "main": "build/index.js",
+    "repository": "https://github.com/nipatiitti/ruokablo-bot.git",
+    "author": "Niilo Jaakkola",
+    "license": "MIT",
+    "scripts": {
+        "lint": "eslint .",
+        "serve": "firebase serve --only functions",
+        "shell": "firebase functions:shell",
+        "start": "npm run shell",
+        "build": "babel ./src -d ./build --source-maps",
+        "deploy": "babel ./src -d ./build --source-maps && firebase deploy --only functions",
+        "logs": "firebase functions:log"
+    },
+    "engines": {
+        "node": "8"
+    },
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^8.2.0",
+        "express": "^4.17.1",
+        "firebase-admin": "^8.0.0",
+        "firebase-functions": "^3.1.0"
+    },
+    "devDependencies": {
+        "@babel/cli": "^7.6.4",
+        "@babel/core": "^7.6.4",
+        "@babel/preset-env": "^7.6.3",
+        "eslint": "^5.12.0",
+        "eslint-plugin-promise": "^4.0.1",
+        "firebase-functions-test": "^0.1.6"
+    },
+    "private": true
+}
