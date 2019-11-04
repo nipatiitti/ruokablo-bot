@@ -105,22 +105,21 @@ export const menu = functions.pubsub
     .onRun(async context => {
         const menu = (await getMenu(dayjs().format("YYYY-MM-DD"))).data
 
-        const hertsi = menu.restaurants[1].menus[0].meals
-        const reaktori = menu.restaurants[3].menus[0].meals
-        const newton = menu.restaurants[2].menus[0].meals
-        const menuString = `
-<b>Reaktor:</b>
-\t\t-<code>${reaktori[2].contents[0].name}</code>
-\t\t-<code>${reaktori[3].contents[0].name}</code>
+        let menuString = ""
 
-<b>Newton:</b>
-\t\t-<code>${newton[0].contents[0].name}</code>
-\t\t-<code>${newton[1].contents[0].name}</code>
-
-<b>Hertsi:</b>
-\t\t-<code>${hertsi[0].contents[0].name}</code>
-\t\t-<code>${hertsi[1].contents[0].name}</code>
-    `
+        menu.restaurants.forEach(restaurant => {
+            menuString += `<b>${restaurant.name}</b>\n`
+            restaurant.menus.forEach(menu => {
+                menuString += `\t<b>${menu.name}</b>\n`
+                menu.meals.forEach(meal => {
+                    menuString += `\t\t<b>${meal.name} - </b>`
+                    meal.contents.forEach((food, index) => {
+                        menuString += `<code>${food.name}${index == meal.contents.length - 1 ? "" : ", "}</code>`
+                    })
+                    menuString += "\n"
+                })
+            })
+        })
 
         try {
             const result = await axios.post(botUrl + "/sendMessage", {
