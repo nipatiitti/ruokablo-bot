@@ -6,7 +6,16 @@ import axios from "axios"
 
 import dayjs from "dayjs"
 
-import { getMenu, handleVote, menuToString, addServer, removeServer, getServers } from "./functions"
+import {
+    getMenu,
+    handleVote,
+    menuToString,
+    addServer,
+    removeServer,
+    getServers,
+    sendHelp,
+    sendStatus
+} from "./functions"
 import { db } from "./database"
 
 // Telegram api url for the bot
@@ -25,6 +34,10 @@ app.post("/", async (req, res) => {
         handleVote(req, res)
     } else if (isMessage) {
         const message = isMessage
+        if (message.from.is_bot) {
+            res.status(200).send("No bots allowed")
+            return
+        }
         const commands =
             message.entities &&
             message.entities.map(entity => {
@@ -45,6 +58,16 @@ app.post("/", async (req, res) => {
                     case "/disable":
                     case "/disable@ruokablo_bot":
                         removeServer(message.chat.id)
+                        break
+
+                    case "/status":
+                    case "/status@ruokablo_bot":
+                        sendStatus(message.chat.id)
+                        break
+
+                    case "/help":
+                    case "/help@ruokablo_bot":
+                        sendHelp(message.chat.id)
                         break
 
                     default:
