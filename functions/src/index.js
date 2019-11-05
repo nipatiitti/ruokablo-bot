@@ -26,7 +26,7 @@ const app = express()
 app.use(cors({ origin: true }))
 
 // Handle post events (messages, etc.)
-app.post("/", async (req, res) => {
+app.post(`/${functions.config().telegram.token.split(":")[1]}`, async (req, res) => {
     const isCallBackQuery = req.body && req.body.callback_query
     const isMessage = req.body && req.body.message
 
