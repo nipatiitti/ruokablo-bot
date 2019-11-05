@@ -1,5 +1,4 @@
 import * as functions from "firebase-functions"
-import * as admin from "firebase-admin"
 import express from "express"
 import cors from "cors"
 
@@ -7,14 +6,11 @@ import axios from "axios"
 
 import dayjs from "dayjs"
 
-import { getMenu, handleVote, menuToString } from "./functions"
-
-// Initialize firebase admin sdk
-admin.initializeApp(functions.config().firebase)
-const db = admin.database()
+import { getMenu, handleVote, menuToString, addServer, removeServer, getServers } from "./functions"
+import { db } from "./database"
 
 // Telegram api url for the bot
-const botUrl = `https://api.telegram.org/bot${functions.config().telegram.token}`
+export const botUrl = `https://api.telegram.org/bot${functions.config().telegram.token}`
 
 // Initialize web server
 const app = express()
@@ -23,9 +19,39 @@ app.use(cors({ origin: true }))
 // Handle post events (messages, etc.)
 app.post("/", async (req, res) => {
     const isCallBackQuery = req.body && req.body.callback_query
+    const isMessage = req.body && req.body.message
 
     if (isCallBackQuery) {
-        handleVote(req, res, db)
+        handleVote(req, res)
+    } else if (isMessage) {
+        const message = isMessage
+        const commands =
+            message.entities &&
+            message.entities.map(entity => {
+                if (entity.type === "bot_command") {
+                    return message.text.substring(entity.offset, entity.length)
+                }
+                return ""
+            })
+
+        if (commands) {
+            commands.forEach(command => {
+                switch (command) {
+                    case "/enable":
+                    case "/enable@ruokablo_bot":
+                        addServer(message.chat.id)
+                        break
+
+                    case "/disable":
+                    case "/disable@ruokablo_bot":
+                        removeServer(message.chat.id)
+                        break
+
+                    default:
+                        break
+                }
+            })
+        }
     }
 
     return res.status(200).send({ status: "not a telegram message" })
@@ -36,34 +62,41 @@ export const menu = functions.pubsub
     .schedule("30 11 * * *")
     .timeZone("EET")
     .onRun(async context => {
-        const menu = (await getMenu(dayjs().format("YYYY-MM-DD"))).data
-        let menuString = menuToString(menu)
-        const chat_id = functions.config().telegram.chat_id
         try {
-            const result = await axios.post(botUrl + "/sendMessage", {
-                chat_id,
-                text: menuString,
-                parse_mode: "HTML",
-                reply_markup: {
-                    inline_keyboard: [
-                        [{ text: "Reaktori: 0", callback_data: "reaktor" }],
-                        [{ text: "Newton: 0", callback_data: "newton" }],
-                        [{ text: "Hertsi: 0", callback_data: "hertsi" }],
-                        [{ text: "SÅÅS/Fusars: 0", callback_data: "såås" }]
-                    ]
+            const menu = (await getMenu(dayjs().format("YYYY-MM-DD"))).data
+            let menuString = menuToString(menu)
+            const ids = await getServers()
+            console.log(ids)
+            ids.forEach(async chat_id => {
+                try {
+                    const result = await axios.post(botUrl + "/sendMessage", {
+                        chat_id,
+                        text: menuString,
+                        parse_mode: "HTML",
+                        reply_markup: {
+                            inline_keyboard: [
+                                [{ text: "Reaktori: 0", callback_data: "reaktor" }],
+                                [{ text: "Newton: 0", callback_data: "newton" }],
+                                [{ text: "Hertsi: 0", callback_data: "hertsi" }],
+                                [{ text: "SÅÅS/Fusars: 0", callback_data: "såås" }]
+                            ]
+                        }
+                    })
+                    const id = result.data.result.message_id
+                    db.ref(`messages/${chat_id}/${id}`).set({
+                        reaktor: 0,
+                        hertsi: 0,
+                        såås: 0,
+                        newton: 0
+                    })
+                } catch (e) {
+                    console.error(e)
                 }
             })
-            const id = result.data.result.message_id
-            db.ref(`messages/${chat_id}/${id}`).set({
-                reaktor: 0,
-                hertsi: 0,
-                såås: 0,
-                newton: 0
-            })
-        } catch (e) {
-            console.error(e)
+        } catch (error) {
+            console.error(error)
         }
     })
 
 // Send the http request forward to the express server
-export const counter = functions.https.onRequest(app)
+export const apiEndPoint = functions.https.onRequest(app)
