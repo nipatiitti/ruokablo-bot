@@ -6,16 +6,22 @@ Wonder no longer!!?!?!
 This bot will tell you what food the Tampere University Hervanta Campus has to offer and show a poll where your group can decide where to go.
 
 Automaticly
+
 Every
+
 Single
+
 Day
+
 At
+
 11.30 AM
 
 ## Installation
 
 [Yarn](https://yarnpkg.com/lang/en/)
-[Firebase-cli](curl -sL firebase.tools | bash)
+
+[Firebase-cli](https://firebase.google.com/docs/cli)
 
 ```bash
 firebase init
