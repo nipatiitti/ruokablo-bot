@@ -14,7 +14,8 @@ import {
     removeServer,
     getServers,
     sendHelp,
-    sendStatus
+    sendStatus,
+    sendMenu
 } from "./functions"
 import { db } from "./database"
 
@@ -65,6 +66,11 @@ app.post(`/${functions.config().telegram.token.split(":")[1]}`, async (req, res)
                         sendStatus(message.chat.id)
                         break
 
+                    case "/fondue":
+                    case "/fondue@ruokablo_bot":
+                        sendMenu(message.chat.id)
+                        break
+
                     case "/help":
                     case "/help@ruokablo_bot":
                         sendHelp(message.chat.id)
@@ -77,7 +83,7 @@ app.post(`/${functions.config().telegram.token.split(":")[1]}`, async (req, res)
         }
     }
 
-    return res.status(200).send({ status: "not a telegram message" })
+    res.status(200).send({ status: "not a telegram message" })
 })
 
 // Timed event that posts the menu for today
@@ -89,7 +95,7 @@ export const menu = functions.pubsub
             const menu = (await getMenu(dayjs().format("YYYY-MM-DD"))).data
             let menuString = menuToString(menu)
             const ids = await getServers()
-            console.log(ids)
+
             ids.forEach(async chat_id => {
                 try {
                     const result = await axios.post(botUrl + "/sendMessage", {

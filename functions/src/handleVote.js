@@ -8,13 +8,24 @@ import { getMenu, menuToString } from "./functions"
 
 import { db } from "./database"
 
+const restaurants = ["reaktor", "hertsi", "såås", "newton"]
+
 export const handleVote = (req, res) => {
     try {
         const cb = req.body.callback_query
         const id = cb.message.message_id
-        const caster = cb.from.id
+        const caster = cb.from.username
         const vote = cb.data
         const chat_id = cb.message.chat.id
+
+        if (!restaurants.includes(vote)) {
+            axios
+                .post(botUrl + "/answerCallbackQuery", {
+                    callback_query_id: cb.id,
+                    text: ""
+                })
+                .catch(e => console.error(e))
+        }
 
         const counterRef = db.ref(`messages/${chat_id}/${id}`)
         let text = ""
@@ -57,8 +68,28 @@ export const handleVote = (req, res) => {
 
                     const counterVal = snapshot.val()
 
+                    let votes = {
+                        hertsi: "Äänet hertsille:\n",
+                        reaktor: "Äänet reaktorille:\n",
+                        såås: "Äänet Sååssille:\n",
+                        newton: "Äänet newtonille:\n"
+                    }
+
+                    for (const username in counterVal) {
+                        if (counterVal.hasOwnProperty(username)) {
+                            const element = counterVal[username]
+                            if (restaurants.includes(username)) {
+                                continue
+                            } else {
+                                votes[element] += `${username}\n`
+                            }
+                        }
+                    }
+
+                    const votesString = `${votes.hertsi}\n\n${votes.reaktor}\n\n${votes.såås}\n\n${votes.newton}`
+
                     const menu = (await getMenu(dayjs().format("YYYY-MM-DD"))).data
-                    let menuString = menuToString(menu)
+                    let menuString = menuToString(menu) + votesString
 
                     axios
                         .post(botUrl + "/editMessageText", {
