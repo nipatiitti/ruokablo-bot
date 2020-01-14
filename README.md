@@ -15,7 +15,7 @@ Day
 
 At
 
-11.30 AM
+10.30 AM
 
 ## Installation
 
