@@ -86,7 +86,7 @@ export const handleVote = (req, res) => {
                         }
                     }
 
-                    const votesString = `${votes.hertsi}\n\n${votes.reaktor}\n\n${votes.såås}\n\n${votes.newton}`
+                    const votesString = `${votes.såås}\n\n${votes.hertsi}\n\n${votes.newton}\n\n${votes.reaktor}`
 
                     const menu = (await getMenu(dayjs().format("YYYY-MM-DD"))).data
                     let menuString = menuToString(menu) + votesString
@@ -99,10 +99,10 @@ export const handleVote = (req, res) => {
                             parse_mode: "HTML",
                             reply_markup: {
                                 inline_keyboard: [
-                                    [{ text: "Reaktori: " + counterVal.reaktor, callback_data: "reaktor" }],
-                                    [{ text: "Newton: " + counterVal.newton, callback_data: "newton" }],
+                                    [{ text: "SÅÅS/Fusars: " + counterVal.såås, callback_data: "såås" }],
                                     [{ text: "Hertsi: " + counterVal.hertsi, callback_data: "hertsi" }],
-                                    [{ text: "SÅÅS/Fusars: " + counterVal.såås, callback_data: "såås" }]
+                                    [{ text: "Newton: " + counterVal.newton, callback_data: "newton" }],
+                                    [{ text: "Reaktori: " + counterVal.reaktor, callback_data: "reaktor" }]
                                 ]
                             }
                         })

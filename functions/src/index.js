@@ -88,7 +88,7 @@ app.post(`/${functions.config().telegram.token.split(":")[1]}`, async (req, res)
 
 // Timed event that posts the menu for today
 export const menu = functions.pubsub
-    .schedule("30 11 * * *")
+    .schedule("30 10 * * *")
     .timeZone("EET")
     .onRun(async context => {
         try {
@@ -104,10 +104,10 @@ export const menu = functions.pubsub
                         parse_mode: "HTML",
                         reply_markup: {
                             inline_keyboard: [
-                                [{ text: "Reaktori: 0", callback_data: "reaktor" }],
-                                [{ text: "Newton: 0", callback_data: "newton" }],
+                                [{ text: "SÅÅS/Fusars: 0", callback_data: "såås" }],
                                 [{ text: "Hertsi: 0", callback_data: "hertsi" }],
-                                [{ text: "SÅÅS/Fusars: 0", callback_data: "såås" }]
+                                [{ text: "Newton: 0", callback_data: "newton" }],
+                                [{ text: "Reaktori: 0", callback_data: "reaktor" }]
                             ]
                         }
                     })
