@@ -66,6 +66,11 @@ app.post(`/${functions.config().telegram.token.split(":")[1]}`, async (req, res)
                         sendStatus(message.chat.id)
                         break
 
+                    case "/yfondue":
+                    case "/yfondue@ruokablo_bot":
+                        sendMenu(message.chat.id, true)
+                        break
+
                     case "/fondue":
                     case "/fondue@ruokablo_bot":
                         sendMenu(message.chat.id)
@@ -85,6 +90,45 @@ app.post(`/${functions.config().telegram.token.split(":")[1]}`, async (req, res)
 
     res.status(200).send({ status: "not a telegram message" })
 })
+
+export const nightPoll = functions.pubsub
+    .schedule("00 15 * * *")
+    .timeZone("EET")
+    .onRun(async () => {
+        try {
+            const menu = (await getMenu(dayjs().format("YYYY-MM-DD"))).data
+            let menuString = menuToString(menu, true)
+            const ids = await getServers()
+
+            ids.forEach(async chat_id => {
+                try {
+                    const result = await axios.post(botUrl + "/sendMessage", {
+                        chat_id,
+                        text: menuString,
+                        parse_mode: "HTML",
+                        reply_markup: {
+                            inline_keyboard: [
+                                [{ text: "SÅÅS/Fusars: 0", callback_data: "såås" }],
+                                [{ text: "Reaktori: 0", callback_data: "reaktor" }]
+                            ]
+                        }
+                    })
+                    const id = result.data.result.message_id
+                    db.ref(`messages/${chat_id}/${id}`).set({
+                        reaktor: 0,
+                        hertsi: 0,
+                        såås: 0,
+                        newton: 0,
+                        nightPoll: true
+                    })
+                } catch (e) {
+                    console.error(e)
+                }
+            })
+        } catch (error) {
+            console.error(error)
+        }
+    })
 
 // Timed event that posts the menu for today
 export const menu = functions.pubsub

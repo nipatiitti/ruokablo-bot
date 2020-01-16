@@ -8,7 +8,7 @@ import { getMenu, menuToString } from "./functions"
 
 import { db } from "./database"
 
-const restaurants = ["reaktor", "hertsi", "såås", "newton"]
+const restaurants = ["reaktor", "hertsi", "såås", "newton", "nightPoll"]
 
 export const handleVote = (req, res) => {
     try {
@@ -75,6 +75,10 @@ export const handleVote = (req, res) => {
                         newton: "Äänet newtonille:\n"
                     }
 
+                    if (counterVal.nightPoll) {
+                        delete votes.hertsi, delete votes.newton
+                    }
+
                     for (const username in counterVal) {
                         if (counterVal.hasOwnProperty(username)) {
                             const element = counterVal[username]
@@ -98,12 +102,17 @@ export const handleVote = (req, res) => {
                             text: menuString,
                             parse_mode: "HTML",
                             reply_markup: {
-                                inline_keyboard: [
-                                    [{ text: "SÅÅS/Fusars: " + counterVal.såås, callback_data: "såås" }],
-                                    [{ text: "Hertsi: " + counterVal.hertsi, callback_data: "hertsi" }],
-                                    [{ text: "Newton: " + counterVal.newton, callback_data: "newton" }],
-                                    [{ text: "Reaktori: " + counterVal.reaktor, callback_data: "reaktor" }]
-                                ]
+                                inline_keyboard: counterVal.nightPoll
+                                    ? [
+                                          [{ text: "SÅÅS/Fusars: " + counterVal.såås, callback_data: "såås" }],
+                                          [{ text: "Reaktori: " + counterVal.reaktor, callback_data: "reaktor" }]
+                                      ]
+                                    : [
+                                          [{ text: "SÅÅS/Fusars: " + counterVal.såås, callback_data: "såås" }],
+                                          [{ text: "Hertsi: " + counterVal.hertsi, callback_data: "hertsi" }],
+                                          [{ text: "Newton: " + counterVal.newton, callback_data: "newton" }],
+                                          [{ text: "Reaktori: " + counterVal.reaktor, callback_data: "reaktor" }]
+                                      ]
                             }
                         })
                         .catch(e => console.error(e))
