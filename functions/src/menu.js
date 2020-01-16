@@ -39,7 +39,7 @@ export const menuToString = menu => {
 
         // Meal
         "Lämmin salaatti",
-        "Wok / Pasta / Burger / Grill ",
+        "Wok / Pasta / Burger / Grill",
         "Erikoislounas",
         "Iltaruoka (16.00 - 18.00)",
         "A´la carte (10.30 - 14.00)",
@@ -57,7 +57,7 @@ export const menuToString = menu => {
         menuString += `<b>${restaurant.name}</b>: `
         restaurant.menus.forEach(menu => {
             if (!remove.includes(menu.name)) {
-                menuString += `\t<i>${menu.name}</i>\n`
+                menuString += menu.name === "Street food" ? `\n\t<i>${menu.name}</i>\n` : `\t<i>${menu.name}</i>\n`
                 menu.meals.forEach(meal => {
                     if (!remove.includes(meal.name)) {
                         menuString += `\t\t<b>${meal.name} - </b>`
