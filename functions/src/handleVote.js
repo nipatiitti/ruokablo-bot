@@ -90,10 +90,12 @@ export const handleVote = (req, res) => {
                         }
                     }
 
-                    const votesString = `${votes.såås}\n\n${votes.hertsi}\n\n${votes.newton}\n\n${votes.reaktor}`
+                    const votesString = counterVal.nightPoll
+                        ? `${votes.såås}\n\n${votes.reaktor}`
+                        : `${votes.såås}\n\n${votes.hertsi}\n\n${votes.newton}\n\n${votes.reaktor}`
 
                     const menu = (await getMenu(dayjs().format("YYYY-MM-DD"))).data
-                    let menuString = menuToString(menu) + votesString
+                    let menuString = menuToString(menu, counterVal.nightPoll) + votesString
 
                     axios
                         .post(botUrl + "/editMessageText", {
