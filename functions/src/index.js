@@ -92,7 +92,7 @@ app.post(`/${functions.config().telegram.token.split(":")[1]}`, async (req, res)
 })
 
 export const nightPoll = functions.pubsub
-    .schedule("00 15 * * *")
+    .schedule("00 15 * * 1,2,3,4,5,6")
     .timeZone("EET")
     .onRun(async () => {
         try {
@@ -132,7 +132,7 @@ export const nightPoll = functions.pubsub
 
 // Timed event that posts the menu for today
 export const menu = functions.pubsub
-    .schedule("30 10 * * *")
+    .schedule("30 10 * * 1,2,3,4,5,6")
     .timeZone("EET")
     .onRun(async context => {
         try {
