@@ -15,7 +15,8 @@ import {
     getServers,
     sendHelp,
     sendStatus,
-    sendMenu
+    sendMenu,
+    sendCorona
 } from "./functions"
 import { db } from "./database"
 
@@ -74,6 +75,11 @@ app.post(`/${functions.config().telegram.token.split(":")[1]}`, async (req, res)
                     case "/fondue":
                     case "/fondue@ruokablo_bot":
                         sendMenu(message.chat.id)
+                        break
+
+                    case "/corona":
+                    case "/corona@ruokablo_bot":
+                        sendCorona(message.chat.id)
                         break
 
                     case "/help":
