@@ -40,6 +40,7 @@ export const sendCorona = async chat_id => {
                 text += `\t\t<i>${place}</i> : ${amount}\n`
             }
         }
+        text += "\t\t<i>Etkot</i> : 1\n"
         text += `\tTotal: ${sickCases}\n\n\tDöd people:\n`
 
         for (let place in DeathsByPlace) {
